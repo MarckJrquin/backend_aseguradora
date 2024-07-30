@@ -1,4 +1,6 @@
-﻿namespace backend_aseguradora.DTOs
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace backend_aseguradora.DTOs
 {
     public class QuoteDto
     {
@@ -8,7 +10,11 @@
         public string InsuranceTypeName { get; set; }
         public int CoverageId { get; set; }
         public string CoverageName { get; set; }
-        public double Price { get; set; }
+
+        [DataType(DataType.Currency)]
+        [DisplayFormat(DataFormatString = "{0:C}")]
+        public decimal Price { get; set; }
+
         public DateTime CreatedAt { get; set; }
     }
 }

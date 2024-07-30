@@ -34,6 +34,7 @@ namespace backend_aseguradora.Utils
             return tokenHandler.WriteToken(token);
         }
 
+
         public static ClaimsPrincipal GetPrincipalFromExpiredToken(string token, string secretKey)
         {
             var tokenHandler = new JwtSecurityTokenHandler();

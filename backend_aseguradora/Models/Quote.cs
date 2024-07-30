@@ -24,7 +24,7 @@ namespace backend_aseguradora.Models
         public Coverage Coverage { get; set; }
 
         [Required]
-        public double Price { get; set; }
+        public decimal Price { get; set; }
 
         [Required]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

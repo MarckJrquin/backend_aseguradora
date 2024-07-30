@@ -85,7 +85,7 @@ namespace backend_aseguradora.Controllers
         [HttpGet("admin")]
         public IActionResult AdminEndpoint()
         {
-            return Ok("This is an admin endpoint.");
+            return Ok("This is an admin test endpoint.");
         }
 
 
@@ -93,7 +93,7 @@ namespace backend_aseguradora.Controllers
         [HttpGet("user")]
         public IActionResult UserEndpoint()
         {
-            return Ok("This is a user endpoint.");
+            return Ok("This is a user test endpoint.");
         }
     }
 }

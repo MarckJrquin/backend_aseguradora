@@ -32,11 +32,10 @@ namespace backend_aseguradora.Controllers
                 var handler = new JwtSecurityTokenHandler();
                 var jwtToken = handler.ReadJwtToken(token);
 
-                // Debugging: log the claims in the token
                 var claims = jwtToken.Claims.Select(c => new { c.Type, c.Value }).ToList();
                 claims.ForEach(c => Console.WriteLine($"Claim Type: {c.Type}, Claim Value: {c.Value}"));
 
-                // Ajustar el código para buscar el reclamo "unique_name"
+                // Ajusta el código para buscar el reclamo "unique_name"
                 var userIdClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "unique_name"); // Cambiado de ClaimTypes.NameIdentifier a "unique_name"
                 if (userIdClaim == null)
                 {
@@ -69,45 +68,79 @@ namespace backend_aseguradora.Controllers
         [HttpPut("profile")]
         public async Task<IActionResult> EditUserProfile([FromBody] EditUserModel model)
         {
-            var userId = GetUserIdFromToken();
-            var result = await _userService.EditUserAsync(userId, model);
-            if (result == "User not found.")
+            if (!ModelState.IsValid)
             {
-                return NotFound(new { message = result });
+                var errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)).ToList();
+                return BadRequest(new { message = "Invalid data", errors });
             }
 
-            return Ok(new { message = result });
+            try
+            {
+                var userId = GetUserIdFromToken();
+                var result = await _userService.EditUserAsync(userId, model);
+                if (result == "User not found.")
+                {
+                    return NotFound(new { message = result });
+                }
+
+                return Ok(new { message = result });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { message = $"Error: {ex.Message}" });
+            }
         }
+
 
         [HttpPut("profile/password")]
         public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordModel model)
         {
-            var userId = GetUserIdFromToken();
-            var result = await _userService.UpdatePasswordAsync(userId, model);
-            if (result == "User not found.")
+            if (!ModelState.IsValid)
             {
-                return NotFound(new { message = result });
-            }
-            if (result != "Password updated successfully.")
-            {
-                return BadRequest(new { message = result });
+                var errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)).ToList();
+                return BadRequest(new { message = "Invalid data", errors });
             }
 
-            return Ok(new { message = result });
+            try
+            {
+                var userId = GetUserIdFromToken();
+                var result = await _userService.UpdatePasswordAsync(userId, model);
+                if (result == "User not found.")
+                {
+                    return NotFound(new { message = result });
+                }
+                if (result != "Password updated successfully.")
+                {
+                    return BadRequest(new { message = result });
+                }
+
+                return Ok(new { message = result });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { message = $"Error: {ex.Message}" });
+            }
         }
 
-        [Authorize(Roles = "admin")]
+
         [HttpDelete("profile")]
         public async Task<IActionResult> DeleteUser()
         {
-            var userId = GetUserIdFromToken();
-            var result = await _userService.DeleteUserAsync(userId);
-            if (result == "User not found.")
+            try
             {
-                return NotFound(new { message = result });
-            }
+                var userId = GetUserIdFromToken();
+                var result = await _userService.DeleteUserAsync(userId);
+                if (result == "User not found.")
+                {
+                    return NotFound(new { message = result });
+                }
 
-            return Ok(new { message = result });
+                return Ok(new { message = result });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { message = $"Error: {ex.Message}" });
+            }
         }
 
 

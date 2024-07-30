@@ -12,7 +12,7 @@ using backend_aseguradora.Data;
 namespace backend_aseguradora.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240729045614_InitialCreate")]
+    [Migration("20240730041714_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -177,8 +177,8 @@ namespace backend_aseguradora.Migrations
                     b.Property<int>("InsuranceTypeId")
                         .HasColumnType("int");
 
-                    b.Property<double>("Price")
-                        .HasColumnType("double");
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");

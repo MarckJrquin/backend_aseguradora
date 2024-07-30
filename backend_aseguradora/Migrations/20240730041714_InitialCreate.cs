@@ -141,7 +141,7 @@ namespace backend_aseguradora.Migrations
                     UserId = table.Column<int>(type: "int", nullable: false),
                     InsuranceTypeId = table.Column<int>(type: "int", nullable: false),
                     CoverageId = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<double>(type: "double", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
                 constraints: table =>

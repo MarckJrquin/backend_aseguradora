@@ -37,11 +37,10 @@ namespace backend_aseguradora.Controllers
                 var handler = new JwtSecurityTokenHandler();
                 var jwtToken = handler.ReadJwtToken(token);
 
-                // Debugging: log the claims in the token
                 var claims = jwtToken.Claims.Select(c => new { c.Type, c.Value }).ToList();
                 claims.ForEach(c => Console.WriteLine($"Claim Type: {c.Type}, Claim Value: {c.Value}"));
 
-                // Ajustar el código para buscar el reclamo "unique_name"
+                // Ajusta el código para buscar el reclamo "unique_name"
                 var userIdClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "unique_name"); // Cambiado de ClaimTypes.NameIdentifier a "unique_name"
                 if (userIdClaim == null)
                 {
@@ -51,7 +50,6 @@ namespace backend_aseguradora.Controllers
             }
             catch (Exception ex)
             {
-                // Log the error
                 Console.WriteLine($"Error decoding token: {ex.Message}");
                 throw;
             }
@@ -98,7 +96,7 @@ namespace backend_aseguradora.Controllers
                 carAge = 1;
             }
 
-            var quotePrice = (model.Cost / carAge) * 0.0035;
+            var quotePrice = Math.Round((model.Cost / carAge) * 0.0035m, 2); // Use 'm' for decimal literals
 
             // Crea una respuesta con todos los datos necesarios
             var quoteResponse = new
@@ -109,7 +107,8 @@ namespace backend_aseguradora.Controllers
                 Car = model,
                 InsuranceType = new { insuranceType.Id, insuranceType.Name },
                 Coverage = new { coverage.Id, coverage.Name },
-                Price = quotePrice
+                Price = quotePrice.ToString("C2"),
+                Date = DateTime.UtcNow.ToString("dd/MM/yyyy - HH:mm")
             };
 
             return Ok(quoteResponse);
@@ -151,7 +150,7 @@ namespace backend_aseguradora.Controllers
                     carAge = 1;
                 }
 
-                var quotePrice = (model.Cost / carAge) * 0.0035;
+                var quotePrice = Math.Round((model.Cost / carAge) * 0.0035m, 2); // Use 'm' for decimal literals
 
                 var quote = new Quote
                 {
@@ -160,7 +159,7 @@ namespace backend_aseguradora.Controllers
                         Brand = model.Brand,
                         Model = model.Model,
                         Year = model.Year,
-                        Cost = (decimal)model.Cost
+                        Cost = Math.Round((decimal)model.Cost, 2)
                     },
                     UserId = userId,
                     InsuranceTypeId = model.InsuranceTypeId,
@@ -180,17 +179,16 @@ namespace backend_aseguradora.Controllers
                         Brand = savedQuote.Car.Brand,
                         Model = savedQuote.Car.Model,
                         Year = savedQuote.Car.Year,
-                        Cost = savedQuote.Car.Cost
+                        Cost = Math.Round(savedQuote.Car.Cost, 2)
                     },
                     InsuranceTypeId = savedQuote.InsuranceTypeId,
                     CoverageId = savedQuote.CoverageId,
-                    Price = savedQuote.Price,
+                    Price = Math.Round(savedQuote.Price, 2),
                     CreatedAt = savedQuote.CreatedAt
                 };
 
-                return Ok(quoteDto);
 
-                return Ok(savedQuote);
+                return Ok(quoteDto);
             }
             catch (Exception ex)
             {
@@ -231,10 +229,10 @@ namespace backend_aseguradora.Controllers
                     q.Car.Brand,
                     q.Car.Model,
                     q.Car.Year,
-                    q.Car.Cost,
+                    Cost = q.Car.Cost.ToString("C2"),
                     InsuranceType = q.InsuranceType.Name,
                     Coverage = q.Coverage.Name,
-                    q.Price,
+                    Price = q.Price.ToString("C2"),
                     createdAt = q.CreatedAt.ToString("yyyy-MM-dd")
                 });
 
@@ -260,10 +258,10 @@ namespace backend_aseguradora.Controllers
                     q.Car.Brand,
                     q.Car.Model,
                     q.Car.Year,
-                    q.Car.Cost,
+                    Cost = q.Car.Cost.ToString("C2"),
                     InsuranceType = q.InsuranceType.Name,
                     Coverage = q.Coverage.Name,
-                    q.Price,
+                    Price = q.Price.ToString("C2"),
                     q.CreatedAt,
                     User = new
                     {
@@ -283,16 +281,23 @@ namespace backend_aseguradora.Controllers
         }
 
 
-        [HttpDelete("{id}")]
+        [HttpDelete("delete-quote/{id}")]
         public async Task<IActionResult> DeleteQuote(int id)
         {
+            var userId = GetUserIdFromToken();
+            var user = await _userService.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found." });
+            }
+
             var success = await _quoteService.DeleteQuoteAsync(id);
             if (!success)
             {
-                return NotFound();
+                return NotFound(new { message = "Quote not found." });
             }
 
-            return NoContent();
+            return Ok(new { message = "Quote deleted successfully." });
         }
     }
 }

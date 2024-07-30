@@ -174,8 +174,8 @@ namespace backend_aseguradora.Migrations
                     b.Property<int>("InsuranceTypeId")
                         .HasColumnType("int");
 
-                    b.Property<double>("Price")
-                        .HasColumnType("double");
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");

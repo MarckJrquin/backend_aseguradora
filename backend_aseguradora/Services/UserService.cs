@@ -37,6 +37,7 @@ namespace backend_aseguradora.Services
             };
         }
 
+
         public async Task<string> EditUserAsync(int id, EditUserModel model)
         {
             var user = await _context.Users.Include(u => u.Person).FirstOrDefaultAsync(u => u.Id == id);
@@ -56,6 +57,7 @@ namespace backend_aseguradora.Services
 
             return "User data updated successfully.";
         }
+
 
         public async Task<string> UpdatePasswordAsync(int id, UpdatePasswordModel model)
         {
@@ -100,6 +102,7 @@ namespace backend_aseguradora.Services
 
             return "User deleted successfully.";
         }
+
 
         public async Task<IEnumerable<object>> GetAllUsersAsync()
         {

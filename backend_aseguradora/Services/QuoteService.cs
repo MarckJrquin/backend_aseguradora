@@ -15,15 +15,14 @@ namespace backend_aseguradora.Services
             _context = context;
         }
 
+
         public async Task<int> GetNextProvisionalQuoteIdAsync()
         {
             // Obtiene el último ID de la cotización (solo para referencia)
-            var lastQuote = await _context.Quotes
-                .OrderByDescending(q => q.Id)
-                .FirstOrDefaultAsync();
-
+            var lastQuote = await _context.Quotes.OrderByDescending(q => q.Id).FirstOrDefaultAsync();
             return lastQuote != null ? lastQuote.Id + 1 : 1;
         }
+
 
         public async Task<Quote> SaveQuoteAsync(Quote quote, int userId)
         {
@@ -32,6 +31,7 @@ namespace backend_aseguradora.Services
             await _context.SaveChangesAsync();
             return quote;
         }
+
 
         public async Task<bool> DeleteQuoteAsync(int id)
         {
@@ -47,6 +47,7 @@ namespace backend_aseguradora.Services
             return true;
         }
 
+
         public async Task<IEnumerable<Quote>> GetQuotesByUserIdAsync(int userId)
         {
             return await _context.Quotes
@@ -54,8 +55,10 @@ namespace backend_aseguradora.Services
                 .Include(q => q.Car)
                 .Include(q => q.InsuranceType)
                 .Include(q => q.Coverage)
+                .OrderByDescending(q => q.CreatedAt)
                 .ToListAsync();
         }
+
 
         public async Task<IEnumerable<Quote>> GetAllQuotesAsync()
         {
